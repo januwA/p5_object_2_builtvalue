@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>js obj to dart built_value</title>
+    <style>
+      body {
+        padding: 0px;
+        margin: 0px;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      textarea {
+        flex: 1;
+        font-family: consolas;
+        font-size: 1rem;
+      }
+      #textarea-box {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: stretch;
+      }
+    </style>
+    <script src="https://unpkg.com/p5@0.7.2/lib/p5.min.js"></script>
+    <script src="https://unpkg.com/p5@0.7.2/lib/addons/p5.dom.min.js"></script>
+    <script src="https://unpkg.com/lodash@4.17.13/lodash"></script>
+    <script src="./sketch.js"></script>
+  </head>
+  <body>
+    <section style="padding: 14px;">
+      <p>
+        <a href="https://charafau.github.io/json2builtvalue/" target="_blank"
+          >灵感</a
+        >
+      </p>
+      <p>不要使用这种数据 `key: [[], [],...]`</p>
+      <p><a href="https://www.json.cn/" target="_blank">检查json是否正确</a></p>
+      root name:
+      <input
+        type="text"
+        name=""
+        id="classname"
+        placeholder="name"
+        value="HelloDto"
+      />
+      <button id="transform">transform</button>
+      <select name="" id="select">
+        <option value="1">object</option>
+        <option value="2">json string</option>
+      </select>
+    </section>
+
+    <div id="textarea-box">
+      <!-- <textarea name="" id="jsobj" cols="30" rows="10">
+          {
+      "id": 1.2,
+      "date": "2017-07-21T10:30:34",
+      "date_gmt": "2017-07-21T17:30:34",
+      "type": "post",
+      "link": "https://example.com",
+      "title": {
+          "rendered": "Json 2 dart built_value converter"
+      },
+      "tags": [
+          1798,
+          6298
+      ],
+      "arrobj": [
+        {"name": "a", "age": 12, "point": [{"x": 100}]},
+        {"name": "b", "age": 14, "point": [{"x": 14}]}
+      ]
+}
+      </textarea> -->
+      <textarea name="" id="jsobj" cols="30" rows="10">
+{
+      id: 1.2,
+      date: "2017-07-21T10:30:34",
+      date_gmt: "2017-07-21T17:30:34",
+      type: "post",
+      link: "https://example.com",
+      title: {
+          "rendered": "Json 2 dart built_value converter"
+      },
+      tags: [
+          1798,
+          6298
+      ],
+      arrobj: [
+        {name: "a", age: 12, point: [{x: 100}]},
+        {name: "b", age: 14, point: [{x: 14}]}
+      ]
+}
+</textarea
+      >
+
+      <textarea name="" id="built_value" cols="30" rows="10"></textarea>
+    </div>
+  </body>
+</html>
