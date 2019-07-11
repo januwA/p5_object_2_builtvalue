@@ -62,7 +62,7 @@ function transform() {
   resultObj = {};
   try {
     let parse = getParse();
-    let rootName = classnameInput.value();
+    let rootName = classnameInput.value().trim();
     makeResultArr(parse, rootName);
     let resultString = makeResultString(resultObj);
     resultString = addHeader(resultString);
@@ -174,7 +174,7 @@ function makeBuiltValueAttr(dartType, k, isList = false) {
 
 // file header
 function addHeader(resultString) {
-  let name = classnameInput.value();
+  let name = classnameInput.value().trim();
   name = _.snakeCase(name);
   let header = `
     library ${name};
@@ -192,8 +192,8 @@ function addHeader(resultString) {
 
 // object string or JSON
 function getParse() {
-  let selectvalue = selectEle.value();
-  let value = jsobjInput.value();
+  let selectvalue = selectEle.value().trim();
+  let value = jsobjInput.value().trim();
   let parse;
   if (selectvalue == 1) {
     parse = new Function("return " + value)();
@@ -213,13 +213,13 @@ function createDartType(v) {
   } else if (_.isBoolean(v)) {
     dartType = "bool";
   } else {
-    dartType = "double";
+    dartType = "double"
   }
   return dartType;
 }
 
 function selectChanged() {
-  let v = selectEle.value();
+  let v = selectEle.value().trim();
   if (v == 1) {
     textareaJsonText = jsobjInput.value().trim();
     jsobjInput.value(textareaObjText);
