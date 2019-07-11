@@ -8,6 +8,43 @@ let built_valueOutput;
 let selectEle;
 let resultObj = {};
 
+let textareaObjText = `{
+      id: 1.2,
+      date: "2017-07-21T10:30:34",
+      date_gmt: "2017-07-21T17:30:34",
+      type: "post",
+      link: "https://example.com",
+      title: {
+          "rendered": "Json 2 dart built_value converter"
+      },
+      tags: [
+          1798,
+          6298
+      ],
+      arrobj: [
+        {name: "a", age: 12, point: [{x: 100}]},
+        {name: "b", age: 14, point: [{x: 14}]}
+      ]
+}`;
+let textareaJsonText = `{
+      "id": 1.2,
+      "date": "2017-07-21T10:30:34",
+      "date_gmt": "2017-07-21T17:30:34",
+      "type": "post",
+      "link": "https://example.com",
+      "title": {
+          "rendered": "Json 2 dart built_value converter"
+      },
+      "tags": [
+          1798,
+          6298
+      ],
+      "arrobj": [
+        {"name": "a", "age": 12, "point": [{"x": 100}]},
+        {"name": "b", "age": 14, "point": [{"x": 14}]}
+      ]
+}`;
+
 function setup() {
   noCanvas();
   classnameInput = select("#classname");
@@ -24,14 +61,14 @@ function setup() {
 function transform() {
   resultObj = {};
   try {
-  let parse = getParse();
-  let rootName = classnameInput.value();
-  makeResultArr(parse, rootName);
-  let resultString = makeResultString(resultObj);
-  resultString = addHeader(resultString);
-  // l(resultString);
-  built_valueOutput.value("");
-  built_valueOutput.value(resultString);
+    let parse = getParse();
+    let rootName = classnameInput.value();
+    makeResultArr(parse, rootName);
+    let resultString = makeResultString(resultObj);
+    resultString = addHeader(resultString);
+    // l(resultString);
+    built_valueOutput.value("");
+    built_valueOutput.value(resultString);
   } catch (er) {
     alert(er);
   }
@@ -184,43 +221,11 @@ function createDartType(v) {
 function selectChanged() {
   let v = selectEle.value();
   if (v == 1) {
-    jsobjInput.value(`{
-      id: 1.2,
-      date: "2017-07-21T10:30:34",
-      date_gmt: "2017-07-21T17:30:34",
-      type: "post",
-      link: "https://example.com",
-      title: {
-          "rendered": "Json 2 dart built_value converter"
-      },
-      tags: [
-          1798,
-          6298
-      ],
-      arrobj: [
-        {name: "a", age: 12, point: [{x: 100}]},
-        {name: "b", age: 14, point: [{x: 14}]}
-      ]
-}`);
+    textareaJsonText = jsobjInput.value().trim();
+    jsobjInput.value(textareaObjText);
   } else if (v == 2) {
-    jsobjInput.value(`{
-      "id": 1.2,
-      "date": "2017-07-21T10:30:34",
-      "date_gmt": "2017-07-21T17:30:34",
-      "type": "post",
-      "link": "https://example.com",
-      "title": {
-          "rendered": "Json 2 dart built_value converter"
-      },
-      "tags": [
-          1798,
-          6298
-      ],
-      "arrobj": [
-        {"name": "a", "age": 12, "point": [{"x": 100}]},
-        {"name": "b", "age": 14, "point": [{"x": 14}]}
-      ]
-}`);
+    textareaObjText = jsobjInput.value().trim();
+    jsobjInput.value(textareaJsonText);
   }
 }
 
