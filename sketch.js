@@ -84,8 +84,14 @@ function makeResultArr(data, name) {
       let v = data[k];
       let type = typeof v;
       if (type === "object") {
-        // object or array
-        if (_.isArray(v)) {
+        if (_.isNull(v)) {
+          // null
+          let dartType = createDartType(v);
+          resultObj[name]["keys"].push(
+            new BuiltValueAttr(k, makeBuiltValueAttr(dartType, k))
+          );
+        } else if (_.isArray(v)) {
+          // array
           if (_.isEmpty(v)) return alert("array is empty!");
           // value is array
           // get type of first a value
@@ -103,7 +109,7 @@ function makeResultArr(data, name) {
             );
             makeResultArr(firstv, k + "Dto");
           }
-        } else {
+        } else if (_.isPlainObject(v)) {
           // object
           let dartType = _.upperFirst(k + "Dto");
           resultObj[name]["keys"].push(
@@ -112,7 +118,7 @@ function makeResultArr(data, name) {
           makeResultArr(v, k + "Dto");
         }
       } else {
-        // string, number, boolean
+        // string, number, boolean, undefined
         let dartType = createDartType(v);
         resultObj[name]["keys"].push(
           new BuiltValueAttr(k, makeBuiltValueAttr(dartType, k))
@@ -163,6 +169,7 @@ function makeResultString(obj) {
 function makeBuiltValueAttr(dartType, k, isList = false) {
   return !isList
     ? `
+      ${dartType == "Null" ? "@nullable" : ""}
       @BuiltValueField(wireName: '${k}')
       ${dartType} get ${_.camelCase(k)};
 `
@@ -212,8 +219,10 @@ function createDartType(v) {
     dartType = "String";
   } else if (_.isBoolean(v)) {
     dartType = "bool";
+  } else if (_.isNull(v) || _.isUndefined(v)) {
+    dartType = "Null";
   } else {
-    dartType = "double"
+    dartType = "double";
   }
   return dartType;
 }
