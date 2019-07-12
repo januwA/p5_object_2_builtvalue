@@ -7,6 +7,8 @@ let transformBtn;
 let built_valueOutput;
 let selectEle;
 let resultObj = {};
+let jsCodeMirror;
+let dartCodeMirror;
 
 let textareaObjText = `{
       id: 1.2,
@@ -53,6 +55,18 @@ function setup() {
   built_valueOutput = select("#built_value");
   selectEle = select("#select");
 
+  jsCodeMirror = CodeMirror.fromTextArea(jsobjInput.elt, {
+    lineNumbers: true,
+    mode: "javascript",
+    theme: "panda-syntax"
+  });
+
+  dartCodeMirror = CodeMirror.fromTextArea(built_valueOutput.elt, {
+    lineNumbers: true,
+    mode: "javascript",
+    theme: "panda-syntax"
+  });
+
   transformBtn.mouseClicked(transform);
   selectEle.changed(selectChanged);
 }
@@ -67,8 +81,7 @@ function transform() {
     let resultString = makeResultString(resultObj);
     resultString = addHeader(resultString);
     // l(resultString);
-    built_valueOutput.value("");
-    built_valueOutput.value(resultString);
+    dartCodeMirror.setValue(resultString.trim());
   } catch (er) {
     alert(er);
   }
@@ -142,25 +155,23 @@ function makeResultString(obj) {
     }
 
     resultString += `
-    abstract class ${k} implements Built<${k}, ${k}Builder> {
-      ${k}._();
+abstract class ${k} implements Built<${k}, ${k}Builder> {
+  ${k}._();
 
-      factory ${k}([updates(${k}Builder b)]) = _$${k};
-      
-      ${attrs}
+  factory ${k}([updates(${k}Builder b)]) = _$${k};
+  ${attrs}
 
-      String toJson() {
-        return jsonEncode(serializers.serializeWith(${k}.serializer, this));
-      }
+  String toJson() {
+    return jsonEncode(serializers.serializeWith(${k}.serializer, this));
+  }
 
-      static ${k} fromJson(String jsonString) {
-        return serializers.deserializeWith(
-            ${k}.serializer, jsonDecode(jsonString));
-      }
+  static ${k} fromJson(String jsonString) {
+    return serializers.deserializeWith(
+        ${k}.serializer, jsonDecode(jsonString));
+  }
 
-      static Serializer<${k}> get serializer => _$${_.lowerFirst(k)}Serializer;
-    }
-    `;
+  static Serializer<${k}> get serializer => _$${_.lowerFirst(k)}Serializer;
+}\r\n`;
   }
   return resultString;
 }
@@ -168,14 +179,13 @@ function makeResultString(obj) {
 // make built_value attr
 function makeBuiltValueAttr(dartType, k, isList = false) {
   return !isList
-    ? `
-      ${dartType == "Null" ? "@nullable" : ""}
-      @BuiltValueField(wireName: '${k}')
-      ${dartType} get ${_.camelCase(k)};
+    ? `${dartType == "Null" ? "\r\n  @nullable" : ""}
+  @BuiltValueField(wireName: '${k}')
+  ${dartType} get ${_.camelCase(k)};
 `
     : `
-      @BuiltValueField(wireName: '${k}')
-      BuiltList<${dartType}> get ${_.camelCase(k)};
+  @BuiltValueField(wireName: '${k}')
+  BuiltList<${dartType}> get ${_.camelCase(k)};
 `;
 }
 
@@ -184,14 +194,14 @@ function addHeader(resultString) {
   let name = classnameInput.value().trim();
   name = _.snakeCase(name);
   let header = `
-    library ${name};
+library ${name};
 
-    import 'dart:convert';
-    import 'package:built_collection/built_collection.dart';
-    import 'package:built_value/built_value.dart';
-    import 'package:built_value/serializer.dart';
+import 'dart:convert';
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
 
-    part '${name}.g.dart';
+part '${name}.g.dart';
   `;
 
   return header + resultString;
@@ -200,7 +210,7 @@ function addHeader(resultString) {
 // object string or JSON
 function getParse() {
   let selectvalue = selectEle.value().trim();
-  let value = jsobjInput.value().trim();
+  let value = jsCodeMirror.getValue().trim();
   let parse;
   if (selectvalue == 1) {
     parse = new Function("return " + value)();
@@ -230,11 +240,11 @@ function createDartType(v) {
 function selectChanged() {
   let v = selectEle.value().trim();
   if (v == 1) {
-    textareaJsonText = jsobjInput.value().trim();
-    jsobjInput.value(textareaObjText);
+    textareaJsonText = jsCodeMirror.getValue().trim();
+    jsCodeMirror.setValue(textareaObjText);
   } else if (v == 2) {
-    textareaObjText = jsobjInput.value().trim();
-    jsobjInput.value(textareaJsonText);
+    textareaObjText = jsCodeMirror.getValue().trim();
+    jsCodeMirror.setValue(textareaJsonText);
   }
 }
 

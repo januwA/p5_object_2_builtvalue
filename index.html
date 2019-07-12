@@ -18,6 +18,11 @@
         font-family: consolas;
         font-size: 1rem;
       }
+      .CodeMirror {
+        flex: 1;
+        min-height: 100%;
+        margin: 1px;
+      }
       #textarea-box {
         flex: 1;
         display: flex;
@@ -29,34 +34,40 @@
     <script src="https://unpkg.com/p5@0.7.2/lib/p5.min.js"></script>
     <script src="https://unpkg.com/p5@0.7.2/lib/addons/p5.dom.min.js"></script>
     <script src="https://unpkg.com/lodash@4.17.13/lodash"></script>
+    <script src="https://unpkg.com/codemirror@5.48.0/lib/codemirror.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/codemirror@5.48.0/lib/codemirror.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/codemirror@5.48.0/theme/panda-syntax.css"
+    />
+    <script src="https://unpkg.com/codemirror@5.48.0/mode/javascript/javascript.js"></script>
     <script src="./sketch.js"></script>
   </head>
   <body>
-    <section style="padding: 14px;">
-      <p>
-        <a href="https://charafau.github.io/json2builtvalue/" target="_blank"
-          >灵感</a
-        >
-      </p>
+    <section style="padding-left: 8px;">
       <p>不要使用这种数据 `key: [[], [],...]`</p>
-      <p><a href="https://www.json.cn/" target="_blank">检查json是否正确</a></p>
-      root name:
-      <input
-        type="text"
-        name=""
-        id="classname"
-        placeholder="name"
-        value="HelloDto"
-      />
-      <button id="transform">transform</button>
-      <select name="" id="select">
-        <option value="1">object</option>
-        <option value="2">json string</option>
-      </select>
+      <p>
+        root name:
+        <input
+          type="text"
+          name=""
+          id="classname"
+          placeholder="name"
+          value="HelloDto"
+        />
+        <button id="transform">transform</button>
+        <select name="" id="select">
+          <option value="1">object</option>
+          <option value="2">json string</option>
+        </select>
+      </p>
     </section>
 
     <div id="textarea-box">
-      <textarea name="" id="jsobj" cols="30" rows="10">
+      <textarea id="jsobj">
 {
       id: 1.2,
       date: "2017-07-21T10:30:34",
@@ -75,10 +86,8 @@
         {name: "b", age: 14, point: [{x: 14}]}
       ]
 }
-</textarea
-      >
-
-      <textarea name="" id="built_value" cols="30" rows="10"></textarea>
+      </textarea>
+      <textarea id="built_value"></textarea>
     </div>
   </body>
 </html>
