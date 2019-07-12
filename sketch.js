@@ -1,53 +1,27 @@
 const l = console.log;
+// root name
 let classnameInput;
+
+// button
 let transformBtn;
+
+// input
 let jsobjInput;
+
+// output
 let built_valueOutput;
+
+// select
 let selectEle;
+
+// editor
 let jsCodeMirror;
 let dartCodeMirror;
-
-let textareaObjText = `{
-      id: 1.2,
-      date: "2017-07-21T10:30:34",
-      date_gmt: "2017-07-21T17:30:34",
-      type: "post",
-      link: "https://example.com",
-      title: {
-          "rendered": "Json 2 dart built_value converter"
-      },
-      tags: [
-          1798,
-          6298
-      ],
-      arrobj: [
-        {name: "a", age: 12, point: [{x: 100}]},
-        {name: "b", age: 14, point: [{x: 14}]}
-      ]
-}`;
-let textareaJsonText = `{
-      "id": 1.2,
-      "date": "2017-07-21T10:30:34",
-      "date_gmt": "2017-07-21T17:30:34",
-      "type": "post",
-      "link": "https://example.com",
-      "title": {
-          "rendered": "Json 2 dart built_value converter"
-      },
-      "tags": [
-          1798,
-          6298
-      ],
-      "arrobj": [
-        {"name": "a", "age": 12, "point": [{"x": 100}]},
-        {"name": "b", "age": 14, "point": [{"x": 14}]}
-      ]
-}`;
 
 function setup() {
   noCanvas();
   classnameInput = select("#classname");
-  jsobjInput = select("#jsobj");
+  jsobjInput = select("#jsobj").value(objectText);
   transformBtn = select("#transform");
   built_valueOutput = select("#built_value");
   selectEle = select("#select");
@@ -92,10 +66,10 @@ function getParse() {
 function selectChanged() {
   let v = selectEle.value().trim();
   if (v == 1) {
-    textareaJsonText = jsCodeMirror.getValue().trim();
-    jsCodeMirror.setValue(textareaObjText);
+    jsonText = jsCodeMirror.getValue().trim();
+    jsCodeMirror.setValue(objectText);
   } else if (v == 2) {
-    textareaObjText = jsCodeMirror.getValue().trim();
-    jsCodeMirror.setValue(textareaJsonText);
+    objectText = jsCodeMirror.getValue().trim();
+    jsCodeMirror.setValue(jsonText);
   }
 }

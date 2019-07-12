@@ -45,6 +45,7 @@
       href="https://unpkg.com/codemirror@5.48.0/theme/dracula.css"
     />
     <script src="https://unpkg.com/codemirror@5.48.0/mode/javascript/javascript.js"></script>
+    <script src="./text.js"></script>
     <script src="./built-value.js"></script>
     <script src="./sketch.js"></script>
   </head>
@@ -69,26 +70,7 @@
     </section>
 
     <div id="textarea-box">
-      <textarea id="jsobj">
-{
-      id: 1.2,
-      date: "2017-07-21T10:30:34",
-      date_gmt: "2017-07-21T17:30:34",
-      type: "post",
-      link: "https://example.com",
-      title: {
-          "rendered": "Json 2 dart built_value converter"
-      },
-      tags: [
-          1798,
-          6298
-      ],
-      arrobj: [
-        {name: "a", age: 12, point: [{x: 100}]},
-        {name: "b", age: 14, point: [{x: 14}]}
-      ]
-}
-      </textarea>
+      <textarea id="jsobj"></textarea>
       <textarea id="built_value"></textarea>
     </div>
   </body>
