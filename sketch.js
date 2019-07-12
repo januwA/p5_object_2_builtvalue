@@ -58,13 +58,13 @@ function setup() {
   jsCodeMirror = CodeMirror.fromTextArea(jsobjInput.elt, {
     lineNumbers: true,
     mode: "javascript",
-    theme: "panda-syntax"
+    theme: "dracula"
   });
 
   dartCodeMirror = CodeMirror.fromTextArea(built_valueOutput.elt, {
     lineNumbers: true,
     mode: "javascript",
-    theme: "panda-syntax"
+    theme: "dracula"
   });
 
   transformBtn.mouseClicked(transform);
@@ -155,6 +155,7 @@ function makeResultString(obj) {
     }
 
     resultString += `
+/// ${k}
 abstract class ${k} implements Built<${k}, ${k}Builder> {
   ${k}._();
 
