@@ -21,7 +21,7 @@ let dartCodeMirror;
 function setup() {
   noCanvas();
   classnameInput = select("#classname");
-  jsobjInput = select("#jsobj").value(objectText);
+  jsobjInput = select("#jsobj").value(objectText.trim());
   transformBtn = select("#transform");
   built_valueOutput = select("#built_value");
   selectEle = select("#select");
