@@ -108,6 +108,12 @@ abstract class ${k} implements Built<${k}, ${k}Builder> {
         ${k}.serializer, jsonDecode(jsonString));
   }
 
+  static List<${k}> fromListJson(String jsonString) {
+    return jsonDecode(jsonString)
+        .map<${k}>((e) => fromJson(jsonEncode(e)))
+        .toList();
+  }
+
   static Serializer<${k}> get serializer => _$${_.lowerFirst(k)}Serializer;
 }\r\n`;
     }
