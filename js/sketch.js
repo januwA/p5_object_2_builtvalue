@@ -10,6 +10,7 @@ let jsobjInput;
 
 // output
 let built_valueOutput;
+let serializersOutput;
 
 // select
 let selectEle;
@@ -17,25 +18,33 @@ let selectEle;
 // editor
 let jsCodeMirror;
 let dartCodeMirror;
+let serializersCodeMirror;
 
 function setup() {
   noCanvas();
-  classnameInput = select("#classname");
-  jsobjInput = select("#jsobj").value(objectText.trim());
-  transformBtn = select("#transform");
-  built_valueOutput = select("#built_value");
-  selectEle = select("#select");
+  classnameInput = select('#classname');
+  jsobjInput = select('#jsobj').value(objectText.trim());
+  transformBtn = select('#transform');
+  built_valueOutput = select('#built_value');
+  serializersOutput = select('#serializers');
+  selectEle = select('#select');
 
   jsCodeMirror = CodeMirror.fromTextArea(jsobjInput.elt, {
     lineNumbers: true,
-    mode: "javascript",
-    theme: "dracula"
+    mode: 'javascript',
+    theme: 'dracula',
   });
 
   dartCodeMirror = CodeMirror.fromTextArea(built_valueOutput.elt, {
     lineNumbers: true,
-    mode: "javascript",
-    theme: "dracula"
+    mode: 'javascript',
+    theme: 'dracula',
+  });
+
+  serializersCodeMirror = CodeMirror.fromTextArea(serializersOutput.elt, {
+    lineNumbers: true,
+    mode: 'javascript',
+    theme: 'dracula',
   });
 
   transformBtn.mouseClicked(transform);
@@ -46,8 +55,9 @@ function setup() {
 function transform() {
   let jsObject = getParse();
   let rootName = classnameInput.value().trim();
-  let builtValue = new BuiltValue(jsObject, rootName);
-  dartCodeMirror.setValue(builtValue.trim());
+
+  dartCodeMirror.setValue(new BuiltValue(jsObject, rootName).trim());
+  serializersCodeMirror.setValue(new BuildSerializers(rootName).trim());
 }
 
 // object string or JSON
@@ -56,7 +66,7 @@ function getParse() {
   let value = jsCodeMirror.getValue().trim();
   let parse;
   if (selectvalue == 1) {
-    parse = new Function("return " + value)();
+    parse = new Function('return ' + value)();
   } else if (selectvalue == 2) {
     parse = JSON.parse(value);
   }

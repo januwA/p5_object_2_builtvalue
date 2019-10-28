@@ -124,8 +124,9 @@ abstract class ${k} implements Built<${k}, ${k}Builder> {
   addHeader(resultString) {
     let name = _.snakeCase(this.rootName);
     let header = `
-/// repo: https://github.com/januwA/p5_object_2_builtvalue
-/// generate: https://januwa.github.io/p5_object_2_builtvalue/index.html
+// ${name}.dart
+// repo: https://github.com/januwA/p5_object_2_builtvalue
+// generate: https://januwa.github.io/p5_object_2_builtvalue/index.html
 
 library ${name};
 
@@ -133,6 +134,7 @@ import 'dart:convert';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
+import 'serializers.dart';
 
 part '${name}.g.dart';
   `;
