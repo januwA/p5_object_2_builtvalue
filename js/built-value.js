@@ -137,6 +137,9 @@ import 'package:built_value/serializer.dart';
 import 'serializers.dart';
 
 part '${name}.g.dart';
+
+// ${JSON.stringify(this.jsObject)}
+
   `;
 
     return header + resultString;

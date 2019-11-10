@@ -1,37 +1,25 @@
 body {
-  padding: 0px;
+  padding: 0;
   margin: 0px;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-textarea {
-  flex: 1;
-  font-family: consolas;
-  font-size: 1rem;
 }
 
 .CodeMirror {
-  flex: 1;
   min-height: 100%;
-  margin: 1px;
   font-family: 'consolas' !important;
 }
 
 #textarea-box {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
+  display: grid;
+  // grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 40% 1fr;
+  grid-gap: 10px;
 
-  .left {
-    flex: 1;
+  section {
+    overflow: auto;
   }
+}
 
-  .right {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
+
+.span-row-2 {
+  grid-row: span 2 / auto;
 }
