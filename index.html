@@ -6,9 +6,22 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>js obj to dart built_value</title>
     <link rel="stylesheet" href="./css/main.css" />
-    <script src="https://unpkg.com/p5@0.7.2/lib/p5.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.min.js"
+      integrity="sha256-8IAwtdm0tRSYpMA1G5K1jpeHZq1N02yrdpoBteVVuMc="
+      crossorigin="anonymous"
+    ></script>
     <script src="https://unpkg.com/p5@0.7.2/lib/addons/p5.dom.min.js"></script>
-    <script src="https://unpkg.com/lodash@4.17.13/lodash"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"
+      integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/json5/0.5.1/json5.min.js"
+      integrity="sha256-v8sXFkSe2BIXdw4jViVp7u0iImlKg4T834KxIMzZ2VQ="
+      crossorigin="anonymous"
+    ></script>
     <script src="https://unpkg.com/codemirror@5.48.0/lib/codemirror.js"></script>
     <link
       rel="stylesheet"
@@ -25,24 +38,22 @@
     <script src="./js/sketch.js"></script>
   </head>
   <body>
-    <section style="padding-left: 8px;">
-      <p>Do not use this data `[[], [], ...]`</p>
-      <p>
-        root name:
-        <input
-          type="text"
-          name=""
-          id="classname"
-          placeholder="name"
-          value="HelloDto"
-        />
-        <button id="transform">transform</button>
-        <select name="" id="select">
-          <option value="1">object</option>
-          <option value="2">json string</option>
-        </select>
-      </p>
-    </section>
+    <p>Do not use this data `[[], [], ...]`</p>
+    <p>
+      root name:
+      <input
+        type="text"
+        name=""
+        id="classname"
+        placeholder="name"
+        value="HelloDto"
+      />
+      <button id="transform">transform</button>
+      <select name="" id="select">
+        <option value="1">object</option>
+        <option value="2">json string</option>
+      </select>
+    </p>
 
     <div id="textarea-box">
       <section class="span-row-2">
