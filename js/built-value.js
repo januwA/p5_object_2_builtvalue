@@ -1,7 +1,22 @@
 class BuiltValueAttr {
-  constructor(k, resultValue) {
+  constructor(k, dartType, isList = false) {
     this.k = k;
-    this.rs = resultValue;
+    this.dk = _.camelCase(k);
+    this.dartType = dartType;
+    this.isList = isList;
+    this.rs = this.makeBuiltValueAttr();
+  }
+
+  makeBuiltValueAttr() {
+    return !this.isList
+      ? `\r\n  @nullable
+  @BuiltValueField(wireName: '${this.k}')
+  ${this.dartType} get ${this.dk};
+`
+      : `\r\n  @nullable
+  @BuiltValueField(wireName: '${this.k}')
+  BuiltList<${this.dartType}> get ${this.dk};
+`;
   }
 }
 class BuiltValue {
@@ -32,9 +47,7 @@ class BuiltValue {
           if (_.isNull(v)) {
             // null
             let dartType = this.createDartType(v);
-            resultObj[name]["keys"].push(
-              new BuiltValueAttr(k, this.makeBuiltValueAttr(dartType, k))
-            );
+            resultObj[name]["keys"].push(new BuiltValueAttr(k, dartType));
           } else if (_.isArray(v)) {
             if (_.isEmpty(v)) return;
             // value is array
@@ -46,50 +59,82 @@ class BuiltValue {
               // string, number, boolean
               let dartType = this.createDartType(firstv);
               resultObj[name]["keys"].push(
-                new BuiltValueAttr(
-                  k,
-                  this.makeBuiltValueAttr(dartType, k, true)
-                )
+                new BuiltValueAttr(k, dartType, true)
               );
             } else {
               let dartType = _.upperFirst(k + "Dto");
               resultObj[name]["keys"].push(
-                new BuiltValueAttr(
-                  k,
-                  this.makeBuiltValueAttr(dartType, k, true)
-                )
+                new BuiltValueAttr(k, dartType, true)
               );
               this.makeResultArr(firstv, k + "Dto");
             }
           } else if (_.isPlainObject(v)) {
             // object
             let dartType = _.upperFirst(k + "Dto");
-            resultObj[name]["keys"].push(
-              new BuiltValueAttr(k, this.makeBuiltValueAttr(dartType, k))
-            );
+            resultObj[name]["keys"].push(new BuiltValueAttr(k, dartType));
             this.makeResultArr(v, k + "Dto");
           }
         } else {
           // string, number, boolean, undefined
           let dartType = this.createDartType(v);
-          resultObj[name]["keys"].push(
-            new BuiltValueAttr(k, this.makeBuiltValueAttr(dartType, k))
-          );
+          resultObj[name]["keys"].push(new BuiltValueAttr(k, dartType));
         }
       }
     }
   }
 
+  // 更具dart的类型返回默认数据
+  dartTypeDefayltValue(t) {
+    if (t === "int" || t === "double") {
+      return 0;
+    }
+
+    if (t === "String") {
+      return "''";
+    }
+
+    if (t === "bool") {
+      return false;
+    }
+
+    if (t === "Null") {
+      return "null";
+    }
+  }
+
+  parseDefaultValue(obj, root, parent = "", dv = ``) {
+    root.keys.forEach((k) => {
+      let param = parent === "" ? k.dk : `${parent}.${k.dk}`;
+      if (k.isList) {
+        dv += `		  ..${param} ??= ListBuilder<${k.dartType}>()\r\n`;
+      } else if (k.dartType.endsWith("Dto")) {
+        let newParent = parent ? parent + "." + k.dk : k.dk;
+        let newRoot = obj[k.dartType];
+        dv += this.parseDefaultValue(obj, newRoot, newParent, ``);
+      } else {
+        dv += `		  ..${param} ??= ${this.dartTypeDefayltValue(k.dartType)}\r\n`;
+      }
+    });
+
+    return dv;
+  }
+
   // 把built_value树，转化为string
   makeResultString(obj) {
+    let dv = this.parseDefaultValue(obj, obj[ROOtNAME]);
     let resultString = ``;
     for (const k in obj) {
       let v = obj[k];
-
       let attrs = ``;
       for (const key of v.keys) {
         attrs += key["rs"];
       }
+
+      let defaultValue =
+        k === ROOtNAME
+          ? `.rebuild(
+        (b) => b${dv.replace(/^\s*/, "")});`
+          : ";";
 
       resultString += `
 /// ${k}
@@ -105,7 +150,7 @@ abstract class ${k} implements Built<${k}, ${k}Builder> {
 
   static ${k} fromJson(String jsonString) {
     return serializers.deserializeWith(
-        ${k}.serializer, jsonDecode(jsonString));
+        ${k}.serializer, jsonDecode(jsonString))${defaultValue}
   }
 
   static List<${k}> fromListJson(String jsonString) {
@@ -145,17 +190,6 @@ part '${name}.g.dart';
     return header + resultString;
   }
 
-  makeBuiltValueAttr(dartType, k, isList = false) {
-    return !isList
-      ? `${dartType == "Null" ? "\r\n  @nullable" : ""}
-  @BuiltValueField(wireName: '${k}')
-  ${dartType} get ${_.camelCase(k)};
-`
-      : `
-  @BuiltValueField(wireName: '${k}')
-  BuiltList<${dartType}> get ${_.camelCase(k)};
-`;
-  }
   // dart type
   createDartType(v) {
     let dartType = "";

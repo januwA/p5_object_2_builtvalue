@@ -20,6 +20,9 @@ let jsCodeMirror;
 let dartCodeMirror;
 let serializersCodeMirror;
 
+// root dto name
+let ROOtNAME;
+
 function setup() {
   noCanvas();
   classnameInput = select("#classname");
@@ -55,10 +58,10 @@ function setup() {
 function transform() {
   const value = jsCodeMirror.getValue().trim();
   const jsObject = JSON5.parse(value);
-  let rootName = classnameInput.value().trim();
+  ROOtNAME = classnameInput.value().trim();
 
-  dartCodeMirror.setValue(new BuiltValue(jsObject, rootName).trim());
-  serializersCodeMirror.setValue(new BuildSerializers(rootName).trim());
+  dartCodeMirror.setValue(new BuiltValue(jsObject, ROOtNAME).trim());
+  serializersCodeMirror.setValue(new BuildSerializers(ROOtNAME).trim());
 }
 
 function selectChanged() {
