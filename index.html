@@ -6,32 +6,19 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>js obj to dart built_value</title>
     <link rel="stylesheet" href="./css/main.css" />
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.min.js"
-      integrity="sha256-8IAwtdm0tRSYpMA1G5K1jpeHZq1N02yrdpoBteVVuMc="
-      crossorigin="anonymous"
-    ></script>
-    <script src="https://unpkg.com/p5@0.7.2/lib/addons/p5.dom.min.js"></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"
-      integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/json5/0.5.1/json5.min.js"
-      integrity="sha256-v8sXFkSe2BIXdw4jViVp7u0iImlKg4T834KxIMzZ2VQ="
-      crossorigin="anonymous"
-    ></script>
-    <script src="https://unpkg.com/codemirror@5.48.0/lib/codemirror.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/json5/0.5.1/json5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/codemirror.min.js"></script>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/codemirror@5.48.0/lib/codemirror.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/codemirror.min.css"
     />
     <link
       rel="stylesheet"
-      href="https://unpkg.com/codemirror@5.48.0/theme/dracula.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/theme/dracula.min.css"
     />
-    <script src="https://unpkg.com/codemirror@5.48.0/mode/javascript/javascript.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/mode/javascript/javascript.min.js"></script>
     <script src="./js/text.js"></script>
     <script src="./js/built-value.js"></script>
     <script src="./js/build-serializers.js"></script>
@@ -53,6 +40,8 @@
         <option value="1">object</option>
         <option value="2">json string</option>
       </select>
+
+      <button id="save" title="Chrome 86+">Save</button>
     </p>
 
     <div id="textarea-box">
