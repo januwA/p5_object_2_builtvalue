@@ -10,7 +10,7 @@ import '${_.snakeCase(rootName)}.dart';
 
 part 'serializers.g.dart';
 
-@SerializersFor(const [
+@SerializersFor([
   ${_.upperFirst(rootName)}
 ])
 final Serializers serializers = (_$serializers.toBuilder()..addPlugin(StandardJsonPlugin())).build();

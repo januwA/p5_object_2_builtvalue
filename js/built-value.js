@@ -141,7 +141,7 @@ class BuiltValue {
 abstract class ${k} implements Built<${k}, ${k}Builder> {
   ${k}._();
 
-  factory ${k}([updates(${k}Builder b)]) = _$${k};
+  factory ${k}([Function(${k}Builder b) updates]) = _$${k};
   ${attrs}
 
   String toJson() {
