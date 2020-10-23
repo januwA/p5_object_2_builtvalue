@@ -5,7 +5,7 @@ let objectText = `{
   type: "post",
   link: "https://example.com",
   title: {
-      "rendered": "Json 2 dart built_value converter"
+      rendered: "Json 2 dart built_value converter"
   },
   tags: [
       1798,

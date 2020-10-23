@@ -20,3 +20,9 @@ body {
 .span-row-2 {
   grid-row: span 2/auto;
 }
+
+
+.warning {
+  color: red;
+  font-weight: bold;
+}

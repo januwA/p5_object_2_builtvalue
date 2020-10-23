@@ -1,6 +1,5 @@
-const l = console.log;
 // root name
-let classnameInput;
+let rootNameInput;
 
 // button
 let transformBtn;
@@ -22,12 +21,9 @@ let jsCodeMirror;
 let dartCodeMirror;
 let serializersCodeMirror;
 
-// root dto name
-let ROOtNAME;
-
 function setup() {
   noCanvas();
-  classnameInput = select("#classname");
+  rootNameInput = select("#classname");
   jsobjInput = select("#jsobj").value(objectText.trim());
   transformBtn = select("#transform");
   built_valueOutput = select("#built_value");
@@ -63,10 +59,14 @@ function setup() {
 function transform() {
   const value = jsCodeMirror.getValue().trim();
   const jsObject = JSON5.parse(value);
-  ROOtNAME = classnameInput.value().trim();
 
-  dartCodeMirror.setValue(new BuiltValue(jsObject, ROOtNAME).trim());
-  serializersCodeMirror.setValue(new BuildSerializers(ROOtNAME).trim());
+  const rootName = getRootName();
+  dartCodeMirror.setValue(new BuiltValue(jsObject, rootName).toString().trim());
+  serializersCodeMirror.setValue(new BuildSerializers(rootName).toString().trim());
+}
+
+function getRootName() {
+  return rootNameInput.value().trim();
 }
 
 // input textarea
@@ -99,9 +99,9 @@ async function saveDtoStr2File() {
     return alert("not data. to click transform button.");
   }
 
-  let dtoFileName = _.snakeCase(ROOtNAME) + ".dart";
+  let saveDirName = getRootName();
+  let dtoFileName = _.snakeCase(saveDirName) + ".dart";
   let serializersFileName = "serializers.dart";
-  let saveDirName = ROOtNAME.trim();
 
   // 获取目录句柄
   const hDir = await window.showDirectoryPicker();

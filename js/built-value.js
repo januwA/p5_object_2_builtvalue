@@ -1,13 +1,72 @@
-class BuiltValueAttr {
-  constructor(k, dartType, isList = false) {
-    this.k = k;
-    this.dk = _.camelCase(k);
-    this.dartType = dartType;
-    this.isList = isList;
-    this.rs = this.makeBuiltValueAttr();
+class Dto {
+  constructor(dtoName, keys = []) {
+    this.dtoName = _.upperFirst(dtoName);
+    this.keys = keys;
   }
 
-  makeBuiltValueAttr() {
+  toString(defaultValue = "") {
+    const attrs = this.keys.reduce((acc, it) => (acc += it.toString()), "");
+    return `
+/// ${this.dtoName}
+abstract class ${this.dtoName} implements Built<${this.dtoName}, ${
+      this.dtoName
+    }Builder> {
+  ${this.dtoName}._();
+
+  factory ${this.dtoName}([Function(${this.dtoName}Builder b) updates]) = _$${
+      this.dtoName
+    };
+  ${attrs}
+
+  String toJson() {
+    return jsonEncode(serializers.serializeWith(${
+      this.dtoName
+    }.serializer, this));
+  }
+
+  static ${this.dtoName} fromJson(String jsonString) {
+    return serializers.deserializeWith(
+        ${this.dtoName}.serializer, jsonDecode(jsonString))${defaultValue}
+  }
+
+  static List<${this.dtoName}> fromListJson(String jsonString) {
+    return jsonDecode(jsonString)
+        .map<${this.dtoName}>((e) => fromJson(jsonEncode(e)))
+        .toList();
+  }
+
+  static Serializer<${this.dtoName}> get serializer => _$${_.lowerFirst(
+      this.dtoName
+    )}Serializer;
+}\r\n`;
+  }
+}
+
+class DtoAttr {
+  #flaBuiltListString = "";
+  constructor(k, dartType, isList = false, flat = 1) {
+    this.k = k; // js key
+    this.dk = _.camelCase(k); // dart key
+    this.dartType = dartType; // dart type
+    this.flat = flat; // 数组嵌套层数
+    this.isList = isList;
+  }
+
+  flaBuiltList() {
+    if (!_.isEmpty(this.#flaBuiltListString)) return this.#flaBuiltListString;
+    let rStart = "";
+    let rEnd = "";
+    let num = this.flat;
+    while (num >= 1) {
+      rStart += `BuiltList<`;
+      rEnd += `>`;
+      num--;
+    }
+    this.#flaBuiltListString = rStart + this.dartType + rEnd;
+    return this.#flaBuiltListString;
+  }
+
+  toString() {
     return !this.isList
       ? `\r\n  @nullable
   @BuiltValueField(wireName: '${this.k}')
@@ -15,69 +74,100 @@ class BuiltValueAttr {
 `
       : `\r\n  @nullable
   @BuiltValueField(wireName: '${this.k}')
-  BuiltList<${this.dartType}> get ${this.dk};
+  ${this.flaBuiltList()} get ${this.dk};
 `;
   }
 }
+
 class BuiltValue {
+  dtoList = [];
+
   constructor(jsObject, rootName) {
     this.jsObject = jsObject;
     this.rootName = rootName;
-    this.resultObj = {};
-    this.makeResultArr(this.jsObject, this.rootName);
-    let resultString = this.makeResultString(this.resultObj);
-    resultString = this.addHeader(resultString);
-    return new String(resultString);
+    this.makeDtoList(this.jsObject, this.rootName);
   }
 
-  // 构建一个built_value树
-  makeResultArr(data, name) {
+  // 将dto列表转换为built_value文件
+  toString() {
+    let dtoDefaultData = this.makeDtoDefaultData(
+      this.dtoList.find(({ dtoName }) => dtoName === this.rootName)
+    );
+
+    return this.addHeader(
+      this.dtoList.reduce((acc, dto) => {
+        let defaultValue =
+          dto.dtoName === this.rootName
+            ? `.rebuild(
+        (b) => b${dtoDefaultData.replace(/^\s*/, "")});`
+            : ";";
+
+        acc += dto.toString(defaultValue);
+        return acc;
+      }, "")
+    );
+  }
+
+  /**
+   *
+   * @param {{value: any: num: number}} o
+   */
+  _parseFlat(o) {
+    if (_.isArray(o.value)) {
+      o.num++;
+      o.value = _.first(o.value);
+      return this._parseFlat(o);
+    } else {
+      return o;
+    }
+  }
+
+  // 递归遍历json，将构建一个dto列表
+  makeDtoList(data, name) {
     if (_.isObjectLike(data)) {
       if (_.isArray(data)) {
         data = _.first(data);
       }
-      let resultObj = this.resultObj;
-      name = _.upperFirst(name);
-      resultObj[name] = {};
-      resultObj[name]["keys"] = [];
+      const dto = new Dto(name);
+      this.dtoList.push(dto);
       for (let k in data) {
-        let v = data[k];
-        let type = typeof v;
-        if (type === "object") {
-          if (_.isNull(v)) {
-            // null
-            let dartType = this.createDartType(v);
-            resultObj[name]["keys"].push(new BuiltValueAttr(k, dartType));
-          } else if (_.isArray(v)) {
+        const v = data[k];
+        if (_.isObjectLike(v)) {
+          if (_.isArray(v)) {
             if (_.isEmpty(v)) return;
             // value is array
             // get type of first a value
-            let firstv = _.first(v);
-            if (_.isArray(firstv))
-              return alert(`data error: [ ${JSON.stringify(firstv)}, ...]`);
-            if (typeof firstv !== "object") {
-              // string, number, boolean
-              let dartType = this.createDartType(firstv);
-              resultObj[name]["keys"].push(
-                new BuiltValueAttr(k, dartType, true)
-              );
+            const firstv = _.first(v);
+            if (_.isArray(firstv)) {
+              const r = this._parseFlat({ value: v, num: 0 });
+              // 数组嵌套数据 [[any]]，递归获取嵌套层数，直到数组第一个值为非数组为止
+              // return alert(`data error: [ ${JSON.stringify(firstv)}, ...]`);
+              if (_.isPlainObject(r.value)) {
+                let itemK = "";
+                for (let i = 0; i < r.num; i++) itemK += "Item";
+                const dartType = _.upperFirst(k + itemK + "Dto");
+                dto.keys.push(new DtoAttr(k, dartType, true, r.num));
+                this.makeDtoList(r.value, dartType);
+              } else {
+                dto.keys.push(new DtoAttr(k, this.jt2dt(r.value), true, r.num));
+              }
+            } else if (_.isPlainObject(firstv)) {
+              const dartType = _.upperFirst(k + "Dto");
+              dto.keys.push(new DtoAttr(k, dartType, true));
+              this.makeDtoList(firstv, dartType);
             } else {
-              let dartType = _.upperFirst(k + "Dto");
-              resultObj[name]["keys"].push(
-                new BuiltValueAttr(k, dartType, true)
-              );
-              this.makeResultArr(firstv, k + "Dto");
+              // string, number, boolean, undefined, null
+              dto.keys.push(new DtoAttr(k, this.jt2dt(firstv), true));
             }
           } else if (_.isPlainObject(v)) {
             // object
-            let dartType = _.upperFirst(k + "Dto");
-            resultObj[name]["keys"].push(new BuiltValueAttr(k, dartType));
-            this.makeResultArr(v, k + "Dto");
+            const dartType = _.upperFirst(k + "Dto");
+            dto.keys.push(new DtoAttr(k, dartType));
+            this.makeDtoList(v, dartType);
           }
         } else {
-          // string, number, boolean, undefined
-          let dartType = this.createDartType(v);
-          resultObj[name]["keys"].push(new BuiltValueAttr(k, dartType));
+          // string, number, boolean, undefined, null
+          dto.keys.push(new DtoAttr(k, this.jt2dt(v)));
         }
       }
     }
@@ -102,71 +192,32 @@ class BuiltValue {
     }
   }
 
-  parseDefaultValue(obj, root, parent = "", dv = ``) {
-    root.keys.forEach((k) => {
-      let param = parent === "" ? k.dk : `${parent}.${k.dk}`;
-      if (k.isList) {
-        dv += `		  ..${param} ??= ListBuilder<${k.dartType}>()\r\n`;
-      } else if (k.dartType.endsWith("Dto")) {
-        let newParent = parent ? parent + "." + k.dk : k.dk;
-        let newRoot = obj[k.dartType];
-        dv += this.parseDefaultValue(obj, newRoot, newParent, ``);
+  makeDtoDefaultData(dto, parent = "", dtoDefaultData = ``) {
+    dto?.keys?.forEach((attr) => {
+      let param = parent === "" ? attr.dk : `${parent}.${attr.dk}`;
+      if (attr.isList) {
+        dtoDefaultData += `		  ..${param} ??= ${attr
+          .flaBuiltList()
+          .replace(/^BuiltList/, " ListBuilder")}()\r\n`;
+      } else if (attr.dartType.endsWith("Dto")) {
+        let newParent = parent ? parent + "." + attr.dk : attr.dk;
+        dtoDefaultData += this.makeDtoDefaultData(
+          this.dtoList.find(({ dtoName }) => dtoName === attr.dartType),
+          newParent,
+          ``
+        );
       } else {
-        dv += `		  ..${param} ??= ${this.dartTypeDefayltValue(k.dartType)}\r\n`;
+        dtoDefaultData += `		  ..${param} ??= ${this.dartTypeDefayltValue(
+          attr.dartType
+        )}\r\n`;
       }
     });
 
-    return dv;
-  }
-
-  // 把built_value树，转化为string
-  makeResultString(obj) {
-    let dv = this.parseDefaultValue(obj, obj[ROOtNAME]);
-    let resultString = ``;
-    for (const k in obj) {
-      let v = obj[k];
-      let attrs = ``;
-      for (const key of v.keys) {
-        attrs += key["rs"];
-      }
-
-      let defaultValue =
-        k === ROOtNAME
-          ? `.rebuild(
-        (b) => b${dv.replace(/^\s*/, "")});`
-          : ";";
-
-      resultString += `
-/// ${k}
-abstract class ${k} implements Built<${k}, ${k}Builder> {
-  ${k}._();
-
-  factory ${k}([Function(${k}Builder b) updates]) = _$${k};
-  ${attrs}
-
-  String toJson() {
-    return jsonEncode(serializers.serializeWith(${k}.serializer, this));
-  }
-
-  static ${k} fromJson(String jsonString) {
-    return serializers.deserializeWith(
-        ${k}.serializer, jsonDecode(jsonString))${defaultValue}
-  }
-
-  static List<${k}> fromListJson(String jsonString) {
-    return jsonDecode(jsonString)
-        .map<${k}>((e) => fromJson(jsonEncode(e)))
-        .toList();
-  }
-
-  static Serializer<${k}> get serializer => _$${_.lowerFirst(k)}Serializer;
-}\r\n`;
-    }
-    return resultString;
+    return dtoDefaultData;
   }
 
   // 添加头文件
-  addHeader(resultString) {
+  addHeader(dtosString) {
     let name = _.snakeCase(this.rootName);
     let header = `
 // ${name}.dart
@@ -187,11 +238,14 @@ part '${name}.g.dart';
 
   `;
 
-    return header + resultString;
+    return header + dtosString;
   }
 
-  // dart type
-  createDartType(v) {
+  /**
+   * js type to dart type
+   * @param {any} v js data
+   */
+  jt2dt(v) {
     let dartType = "";
     if (_.isInteger(v)) {
       dartType = "int";
