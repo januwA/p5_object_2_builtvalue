@@ -1,4 +1,4 @@
-class BuildSerializers {
+export default class BuildSerializers {
   constructor(rootName) {
     this.rootName = rootName;
   }

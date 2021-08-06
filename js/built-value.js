@@ -1,4 +1,4 @@
-class Dto {
+export class Dto {
   constructor(dtoName, keys = []) {
     this.dtoName = _.upperFirst(dtoName);
     this.keys = keys;
@@ -42,7 +42,7 @@ abstract class ${this.dtoName} implements Built<${this.dtoName}, ${
   }
 }
 
-class DtoAttr {
+export class DtoAttr {
   #flaBuiltListString = "";
   constructor(k, dartType, isList = false, flat = 1) {
     this.k = k; // js key
@@ -79,7 +79,7 @@ class DtoAttr {
   }
 }
 
-class BuiltValue {
+export class BuiltValue {
   dtoList = [];
 
   constructor(jsObject, rootName) {
